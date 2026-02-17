@@ -1,4 +1,7 @@
 # AZ-700 Lab 2: Private Endpoint + DNS Resolution
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fme-mysel%2FAZ-700%2Fmain%2FLabs%2FLab02_PrivateEndpoint_DNS%2Fmain.json)
+
 ## Hands-On Lab Guide
 
 ### 🎯 Learning Objectives

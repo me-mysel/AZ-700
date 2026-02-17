@@ -1,5 +1,7 @@
 # AZ-700 Lab: Application Gateway with Application Security Groups
 
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fme-mysel%2FAZ-700%2Fmain%2FLabs%2FLab_AppGateway_ASG%2Fmain.json)
+
 ## 🎯 Lab Objectives
 
 By completing this lab, you will learn to:

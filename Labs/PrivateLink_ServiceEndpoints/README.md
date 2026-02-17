@@ -1,5 +1,7 @@
 # Lab: Private Link, Private Endpoints & Service Endpoints
 
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fme-mysel%2FAZ-700%2Fmain%2FLabs%2FPrivateLink_ServiceEndpoints%2Fmain.json)
+
 ## Lab Overview
 
 This hands-on lab demonstrates the differences between Service Endpoints, Private Endpoints, and Private Link Service in Azure. You'll deploy infrastructure using Bicep and test connectivity scenarios.

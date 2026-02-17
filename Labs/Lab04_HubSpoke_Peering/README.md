@@ -1,5 +1,7 @@
 # AZ-700 Lab 4: Hub-Spoke Architecture with VNet Peering
 
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fme-mysel%2FAZ-700%2Fmain%2FLabs%2FLab04_HubSpoke_Peering%2Fmain.json)
+
 ## 🎯 Learning Objectives
 1. Understand **Hub-Spoke** topology (most common Azure pattern)
 2. Configure **VNet Peering** and understand its properties

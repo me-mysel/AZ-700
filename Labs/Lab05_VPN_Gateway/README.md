@@ -1,5 +1,7 @@
 # AZ-700 Lab 5: VPN Gateway Fundamentals
 
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fme-mysel%2FAZ-700%2Fmain%2FLabs%2FLab05_VPN_Gateway%2Fmain.json)
+
 ## 🎯 Learning Objectives
 
 1. Understand **VPN Gateway** deployment and configuration
