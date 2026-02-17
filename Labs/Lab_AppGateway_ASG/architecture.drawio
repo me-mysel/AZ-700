@@ -1,0 +1,107 @@
+<mxfile host="65bd71144e">
+    <diagram name="Application Gateway + ASG Architecture" id="appgw-asg-architecture">
+        <mxGraphModel dx="938" dy="809" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="internet" value="Internet" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="470" y="20" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="pip" value="pip-appgw&#xa;(Public IP)&#xa;Standard SKU" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="480" y="110" width="100" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#6c8ebf;" parent="1" source="internet" target="pip" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="vnet" value="vnet-lab-appgw (10.10.0.0/16)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;verticalAlign=top;fontSize=14;fontStyle=1;strokeWidth=2;dashed=1;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="180" width="900" height="450" as="geometry"/>
+                </mxCell>
+                <mxCell id="appgw-subnet" value="AppGatewaySubnet&#xa;10.10.0.0/24&#xa;(No NSG)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;verticalAlign=top;fontSize=12;fontStyle=1;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="220" width="260" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="appgw" value="appgw-lab&#xa;Application Gateway v2&#xa;Standard_v2 SKU&#xa;&#xa;• HTTP Listener :80&#xa;• Backend Pool&#xa;• Health Probes&#xa;• Routing Rules" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=center;" parent="1" vertex="1">
+                    <mxGeometry x="120" y="270" width="220" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#82b366;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="pip" target="appgw" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="530" y="180"/>
+                            <mxPoint x="230" y="180"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="web-subnet" value="WebSubnet&#xa;10.10.1.0/24" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;fontSize=12;fontStyle=1;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="220" width="260" height="390" as="geometry"/>
+                </mxCell>
+                <mxCell id="nsg-web" value="nsg-web-tier" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="420" y="260" width="80" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="asg-web-badge" value="asg-webservers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="540" y="260" width="90" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="vm-web-01" value="vm-web-01&#xa;Windows Server 2022&#xa;IIS Web Server&#xa;&#xa;NIC: nic-vm-web-01&#xa;ASG: asg-webservers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;align=center;" parent="1" vertex="1">
+                    <mxGeometry x="420" y="290" width="150" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="vm-web-02" value="vm-web-02&#xa;Windows Server 2022&#xa;IIS Web Server&#xa;&#xa;NIC: nic-vm-web-02&#xa;ASG: asg-webservers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;align=center;" parent="1" vertex="1">
+                    <mxGeometry x="420" y="410" width="150" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow3" value="HTTP :80" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#82b366;dashed=1;" parent="1" source="appgw" target="vm-web-01" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#82b366;dashed=1;" parent="1" source="appgw" target="vm-web-02" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="370" y="370"/>
+                            <mxPoint x="370" y="460"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="app-subnet" value="AppSubnet&#xa;10.10.2.0/24" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;verticalAlign=top;fontSize=12;fontStyle=1;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="700" y="220" width="260" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="nsg-app" value="nsg-app-tier" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="710" y="250" width="80" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="asg-app-badge" value="asg-appservers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="860" y="250" width="90" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="vm-app-01" value="vm-app-01&#xa;Windows Server 2022&#xa;Application Server&#xa;&#xa;NIC: nic-vm-app-01&#xa;ASG: asg-appservers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;align=center;" parent="1" vertex="1">
+                    <mxGeometry x="755" y="290" width="150" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow5" value="TCP :8080&#xa;(ASG→ASG)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#d79b00;dashed=1;" parent="1" source="vm-web-01" target="vm-app-01" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="nsg-rules-web" value="NSG Rules (nsg-web-tier):&#xa;&#xa;100: Allow HTTP from AppGW subnet → asg-webservers&#xa;110: Allow HTTPS from AppGW subnet → asg-webservers&#xa;120: Allow 65200-65535 from GatewayManager&#xa;200: Allow RDP (lab only)&#xa;4096: Deny All Inbound" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;align=left;spacingLeft=5;" parent="1" vertex="1">
+                    <mxGeometry x="410" y="530" width="260" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="nsg-rules-app" value="NSG Rules (nsg-app-tier):&#xa;&#xa;100: Allow TCP 8080&#xa;      FROM: asg-webservers&#xa;      TO: asg-appservers&#xa;200: Allow RDP (lab only)&#xa;4096: Deny All Inbound" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;align=left;spacingLeft=5;" parent="1" vertex="1">
+                    <mxGeometry x="700" y="450" width="200" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend" value="Legend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;verticalAlign=top;fontSize=12;fontStyle=1;strokeWidth=1;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="420" width="250" height="190" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-appgw" value="Application Gateway" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="110" y="450" width="110" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-web" value="Web Tier (ASG)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="110" y="480" width="110" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-app" value="App Tier (ASG)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="110" y="510" width="110" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-nsg" value="NSG" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="110" y="540" width="110" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-asg" value="ASG" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="110" y="570" width="110" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-text" value="Traffic Flow:&#xa;Internet → AppGW → Web VMs&#xa;Web VMs → App VM (via ASG rules)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="230" y="450" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="title" value="AZ-700 Lab: Application Gateway with Application Security Groups" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="290" y="680" width="500" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

@@ -1,0 +1,30 @@
+# ============================================================================
+# AZ-700 Repository .gitignore
+# ============================================================================
+
+# Exclude commercial exam software (MeasureUp)
+MeasureUp/
+
+# IDE / Editor files
+*.code-workspace
+.vscode/
+
+# OS generated files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Obsidian metadata
+.obsidian/
+Study_Notes/.obsidian/
+
+# PowerShell / Azure artifacts
+*.log
+*.bak
+
+# Sensitive files - never commit credentials
+*.pfx
+*.pem
+*.key
+secrets.json
+local.settings.json

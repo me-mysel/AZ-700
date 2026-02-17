@@ -1,0 +1,181 @@
+<mxfile host="app.diagrams.net" modified="2026-01-25T12:00:00.000Z" agent="5.0" etag="az700-traffic-manager" version="21.0.0" type="device">
+  <diagram name="Traffic Manager Architecture" id="traffic-manager-arch">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="Azure Traffic Manager - DNS-Based Global Load Balancing" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="500" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- User -->
+        <mxCell id="user" value="User&#xa;(London)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="530" y="70" width="40" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- DNS Query Arrow -->
+        <mxCell id="dns-arrow" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#0066CC;dashed=1;" edge="1" parent="1" source="user" target="tm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dns-label" value="1. DNS Query&#xa;app.trafficmanager.net" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;fontColor=#0066CC;" vertex="1" parent="1">
+          <mxGeometry x="580" y="140" width="120" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Traffic Manager -->
+        <mxCell id="tm" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="400" y="180" width="300" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="tm-title" value="Traffic Manager Profile" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="190" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tm-details" value="DNS Name: app.trafficmanager.net&#xa;Routing Method: Performance&#xa;TTL: 30 seconds&#xa;Health Probe: HTTPS /health&#xa;Probe Interval: 10 seconds" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="420" y="215" width="260" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tm-note" value="DNS ONLY - Not in data path!" style="text;html=1;strokeColor=none;fillColor=#f8cecc;align=center;fontSize=10;fontStyle=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="440" y="305" width="220" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- DNS Response Arrow -->
+        <mxCell id="dns-response" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#009900;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="tm" target="response-note">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="response-note" value="2. DNS Response&#xa;IP: 52.xxx.xxx.xxx&#xa;(West Europe)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="220" y="230" width="120" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Health Probe Arrows -->
+        <mxCell id="probe1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1;strokeColor=#d6b656;dashed=1;dashPattern=5 5;" edge="1" parent="1" source="tm" target="ep-westus">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="probe2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1;strokeColor=#d6b656;dashed=1;dashPattern=5 5;" edge="1" parent="1" source="tm" target="ep-westeu">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="probe3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1;strokeColor=#d6b656;dashed=1;dashPattern=5 5;" edge="1" parent="1" source="tm" target="ep-eastasia">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Endpoints Container -->
+        <mxCell id="endpoints-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;dashed=1;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="400" width="940" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="endpoints-label" value="Endpoints (Backend Resources)" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="90" y="405" width="200" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- West US Endpoint -->
+        <mxCell id="ep-westus" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="100" y="440" width="180" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-westus-title" value="West US" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="140" y="448" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-westus-details" value="App Service&#xa;Priority: 2&#xa;Weight: 100&#xa;Latency: 120ms" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="120" y="470" width="140" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-westus-status" value="✓ Healthy" style="text;html=1;strokeColor=none;fillColor=#d5e8d4;align=center;fontSize=10;fontStyle=1;fontColor=#006600;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="140" y="530" width="100" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- West Europe Endpoint (Selected) -->
+        <mxCell id="ep-westeu" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#006600;strokeWidth=4;" vertex="1" parent="1">
+          <mxGeometry x="320" y="440" width="180" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-westeu-title" value="West Europe" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="448" width="120" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-westeu-details" value="App Service&#xa;Priority: 1&#xa;Weight: 100&#xa;Latency: 20ms ⭐" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="340" y="470" width="140" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-westeu-status" value="✓ Healthy (SELECTED)" style="text;html=1;strokeColor=none;fillColor=#d5e8d4;align=center;fontSize=10;fontStyle=1;fontColor=#006600;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="530" width="120" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- East Asia Endpoint (Unhealthy) -->
+        <mxCell id="ep-eastasia" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="540" y="440" width="180" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-eastasia-title" value="East Asia" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="448" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-eastasia-details" value="App Service&#xa;Priority: 3&#xa;Weight: 100&#xa;Latency: 180ms" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="560" y="470" width="140" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-eastasia-status" value="✗ Unhealthy" style="text;html=1;strokeColor=none;fillColor=#f8cecc;align=center;fontSize=10;fontStyle=1;fontColor=#CC0000;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="530" width="100" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- External Endpoint -->
+        <mxCell id="ep-external" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="760" y="440" width="180" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-external-title" value="On-Premises (External)" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="780" y="448" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-external-details" value="External Endpoint&#xa;Priority: 4&#xa;Weight: 50&#xa;EndpointLocation: UK South" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="775" y="470" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-external-status" value="✓ Healthy" style="text;html=1;strokeColor=none;fillColor=#d5e8d4;align=center;fontSize=10;fontStyle=1;fontColor=#006600;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="800" y="530" width="100" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Direct Connection Arrow -->
+        <mxCell id="direct-connect" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=3;strokeColor=#006600;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="user" target="ep-westeu">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="550" y="100" />
+              <mxPoint x="750" y="100" />
+              <mxPoint x="750" y="380" />
+              <mxPoint x="410" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="direct-label" value="3. User connects DIRECTLY&#xa;to endpoint IP&#xa;(TM not in path)" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;fontColor=#006600;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="760" y="200" width="150" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="80" y="600" width="500" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-title" value="Legend" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="90" y="605" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-1" value="Azure Endpoint (Healthy)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="100" y="630" width="140" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-2" value="Unhealthy Endpoint" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="250" y="630" width="140" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-3" value="External Endpoint" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="400" y="630" width="140" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-4" value="- - - → Health Probes" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="100" y="665" width="120" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-5" value="──→ DNS Query/Response" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="250" y="665" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-6" value="══→ Direct User Traffic" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="400" y="665" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-note" value="⚡ Performance routing selects lowest latency healthy endpoint" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="100" y="685" width="350" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Routing Methods Box -->
+        <mxCell id="routing-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="600" y="600" width="420" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="routing-title" value="Routing Methods Quick Reference" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="610" y="605" width="220" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="routing-methods" value="• Priority: Failover (primary → secondary)&#xa;• Weighted: Percentage distribution (A/B testing)&#xa;• Performance: Lowest latency (best UX)&#xa;• Geographic: Location-based (compliance)&#xa;• MultiValue: Return all healthy IPs&#xa;• Subnet: Route by client IP range" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="610" y="625" width="400" height="80" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
