@@ -1,0 +1,624 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.31.92.45157",
+      "templateHash": "5575867336776512264"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Azure region for all resources"
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "defaultValue": "azureadmin",
+      "metadata": {
+        "description": "Admin username for VMs"
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Admin password for VMs"
+      }
+    },
+    "vpnGatewaySku": {
+      "type": "string",
+      "defaultValue": "VpnGw1AZ",
+      "allowedValues": [
+        "VpnGw1AZ",
+        "VpnGw2AZ"
+      ],
+      "metadata": {
+        "description": "VPN Gateway SKU - Only AZ SKUs are supported (non-AZ deprecated)"
+      }
+    },
+    "vpnSharedKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Shared key for VPN connection"
+      }
+    }
+  },
+  "variables": {
+    "onPremVnetName": "vnet-onprem-simulated",
+    "onPremAddressPrefix": "192.168.0.0/16",
+    "onPremGatewaySubnetPrefix": "192.168.255.0/27",
+    "onPremWorkloadSubnetPrefix": "192.168.1.0/24",
+    "azureVnetName": "vnet-azure-hub",
+    "azureAddressPrefix": "10.0.0.0/16",
+    "azureGatewaySubnetPrefix": "10.0.255.0/27",
+    "azureWorkloadSubnetPrefix": "10.0.1.0/24"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2023-09-01",
+      "name": "[variables('onPremVnetName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('onPremAddressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "GatewaySubnet",
+            "properties": {
+              "addressPrefix": "[variables('onPremGatewaySubnetPrefix')]"
+            }
+          },
+          {
+            "name": "snet-onprem-workload",
+            "properties": {
+              "addressPrefix": "[variables('onPremWorkloadSubnetPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-onprem')]"
+              }
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-onprem')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2023-09-01",
+      "name": "[variables('azureVnetName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('azureAddressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "GatewaySubnet",
+            "properties": {
+              "addressPrefix": "[variables('azureGatewaySubnetPrefix')]"
+            }
+          },
+          {
+            "name": "snet-azure-workload",
+            "properties": {
+              "addressPrefix": "[variables('azureWorkloadSubnetPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-azure')]"
+              }
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-azure')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2023-09-01",
+      "name": "nsg-onprem",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "AllowRDP",
+            "properties": {
+              "priority": 1000,
+              "direction": "Inbound",
+              "access": "Allow",
+              "protocol": "Tcp",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "3389"
+            }
+          },
+          {
+            "name": "AllowICMP",
+            "properties": {
+              "priority": 1100,
+              "direction": "Inbound",
+              "access": "Allow",
+              "protocol": "Icmp",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "*"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2023-09-01",
+      "name": "nsg-azure",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "AllowRDP",
+            "properties": {
+              "priority": 1000,
+              "direction": "Inbound",
+              "access": "Allow",
+              "protocol": "Tcp",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "3389"
+            }
+          },
+          {
+            "name": "AllowICMP",
+            "properties": {
+              "priority": 1100,
+              "direction": "Inbound",
+              "access": "Allow",
+              "protocol": "Icmp",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "*"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2023-09-01",
+      "name": "pip-vpngw-onprem",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard"
+      },
+      "zones": [
+        "1",
+        "2",
+        "3"
+      ],
+      "properties": {
+        "publicIPAllocationMethod": "Static"
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2023-09-01",
+      "name": "pip-vpngw-azure",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard"
+      },
+      "zones": [
+        "1",
+        "2",
+        "3"
+      ],
+      "properties": {
+        "publicIPAllocationMethod": "Static"
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworkGateways",
+      "apiVersion": "2023-09-01",
+      "name": "vpngw-onprem",
+      "location": "[parameters('location')]",
+      "properties": {
+        "gatewayType": "Vpn",
+        "vpnType": "RouteBased",
+        "sku": {
+          "name": "[parameters('vpnGatewaySku')]",
+          "tier": "[parameters('vpnGatewaySku')]"
+        },
+        "enableBgp": true,
+        "bgpSettings": {
+          "asn": 65001
+        },
+        "ipConfigurations": [
+          {
+            "name": "vnetGatewayConfig",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'pip-vpngw-onprem')]"
+              },
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('onPremVnetName'), 'GatewaySubnet')]"
+              }
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('onPremVnetName'))]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', 'pip-vpngw-onprem')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworkGateways",
+      "apiVersion": "2023-09-01",
+      "name": "vpngw-azure",
+      "location": "[parameters('location')]",
+      "properties": {
+        "gatewayType": "Vpn",
+        "vpnType": "RouteBased",
+        "sku": {
+          "name": "[parameters('vpnGatewaySku')]",
+          "tier": "[parameters('vpnGatewaySku')]"
+        },
+        "enableBgp": true,
+        "bgpSettings": {
+          "asn": 65002
+        },
+        "ipConfigurations": [
+          {
+            "name": "vnetGatewayConfig",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'pip-vpngw-azure')]"
+              },
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('azureVnetName'), 'GatewaySubnet')]"
+              }
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('azureVnetName'))]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', 'pip-vpngw-azure')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/localNetworkGateways",
+      "apiVersion": "2023-09-01",
+      "name": "lng-onprem",
+      "location": "[parameters('location')]",
+      "properties": {
+        "gatewayIpAddress": "[reference(resourceId('Microsoft.Network/publicIPAddresses', 'pip-vpngw-onprem'), '2023-09-01').ipAddress]",
+        "bgpSettings": {
+          "asn": 65001,
+          "bgpPeeringAddress": "[reference(resourceId('Microsoft.Network/virtualNetworkGateways', 'vpngw-onprem'), '2023-09-01').bgpSettings.bgpPeeringAddress]"
+        },
+        "localNetworkAddressSpace": {
+          "addressPrefixes": []
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworkGateways', 'vpngw-onprem')]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', 'pip-vpngw-onprem')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/localNetworkGateways",
+      "apiVersion": "2023-09-01",
+      "name": "lng-azure",
+      "location": "[parameters('location')]",
+      "properties": {
+        "gatewayIpAddress": "[reference(resourceId('Microsoft.Network/publicIPAddresses', 'pip-vpngw-azure'), '2023-09-01').ipAddress]",
+        "bgpSettings": {
+          "asn": 65002,
+          "bgpPeeringAddress": "[reference(resourceId('Microsoft.Network/virtualNetworkGateways', 'vpngw-azure'), '2023-09-01').bgpSettings.bgpPeeringAddress]"
+        },
+        "localNetworkAddressSpace": {
+          "addressPrefixes": []
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworkGateways', 'vpngw-azure')]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', 'pip-vpngw-azure')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/connections",
+      "apiVersion": "2023-09-01",
+      "name": "conn-onprem-to-azure",
+      "location": "[parameters('location')]",
+      "properties": {
+        "connectionType": "IPsec",
+        "virtualNetworkGateway1": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', 'vpngw-onprem')]"
+        },
+        "localNetworkGateway2": {
+          "id": "[resourceId('Microsoft.Network/localNetworkGateways', 'lng-azure')]"
+        },
+        "sharedKey": "[parameters('vpnSharedKey')]",
+        "enableBgp": true,
+        "connectionProtocol": "IKEv2"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/localNetworkGateways', 'lng-azure')]",
+        "[resourceId('Microsoft.Network/virtualNetworkGateways', 'vpngw-onprem')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/connections",
+      "apiVersion": "2023-09-01",
+      "name": "conn-azure-to-onprem",
+      "location": "[parameters('location')]",
+      "properties": {
+        "connectionType": "IPsec",
+        "virtualNetworkGateway1": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', 'vpngw-azure')]"
+        },
+        "localNetworkGateway2": {
+          "id": "[resourceId('Microsoft.Network/localNetworkGateways', 'lng-onprem')]"
+        },
+        "sharedKey": "[parameters('vpnSharedKey')]",
+        "enableBgp": true,
+        "connectionProtocol": "IKEv2"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworkGateways', 'vpngw-azure')]",
+        "[resourceId('Microsoft.Network/localNetworkGateways', 'lng-onprem')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2023-09-01",
+      "name": "pip-vm-onprem",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static"
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2023-09-01",
+      "name": "pip-vm-azure",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static"
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2023-09-01",
+      "name": "nic-vm-onprem",
+      "location": "[parameters('location')]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[reference(resourceId('Microsoft.Network/virtualNetworks', variables('onPremVnetName')), '2023-09-01').subnets[1].id]"
+              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "192.168.1.4",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'pip-vm-onprem')]"
+              }
+            }
+          }
+        ],
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-onprem')]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-onprem')]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', 'pip-vm-onprem')]",
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('onPremVnetName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2023-09-01",
+      "name": "nic-vm-azure",
+      "location": "[parameters('location')]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[reference(resourceId('Microsoft.Network/virtualNetworks', variables('azureVnetName')), '2023-09-01').subnets[1].id]"
+              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "10.0.1.4",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'pip-vm-azure')]"
+              }
+            }
+          }
+        ],
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-azure')]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-azure')]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', 'pip-vm-azure')]",
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('azureVnetName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2023-09-01",
+      "name": "vm-onprem",
+      "location": "[parameters('location')]",
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "Standard_B2s"
+        },
+        "osProfile": {
+          "computerName": "vm-onprem",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "2022-datacenter-azure-edition",
+            "version": "latest"
+          },
+          "osDisk": {
+            "createOption": "FromImage",
+            "managedDisk": {
+              "storageAccountType": "Standard_LRS"
+            }
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', 'nic-vm-onprem')]"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', 'nic-vm-onprem')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2023-09-01",
+      "name": "vm-azure",
+      "location": "[parameters('location')]",
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "Standard_B2s"
+        },
+        "osProfile": {
+          "computerName": "vm-azure",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "2022-datacenter-azure-edition",
+            "version": "latest"
+          },
+          "osDisk": {
+            "createOption": "FromImage",
+            "managedDisk": {
+              "storageAccountType": "Standard_LRS"
+            }
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', 'nic-vm-azure')]"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', 'nic-vm-azure')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2023-09-01",
+      "name": "[format('{0}/{1}', 'vm-onprem', 'EnableICMP')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publisher": "Microsoft.Compute",
+        "type": "CustomScriptExtension",
+        "typeHandlerVersion": "1.10",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "commandToExecute": "powershell -Command \"netsh advfirewall firewall add rule name=ICMP protocol=icmpv4 dir=in action=allow\""
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines', 'vm-onprem')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2023-09-01",
+      "name": "[format('{0}/{1}', 'vm-azure', 'EnableICMP')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publisher": "Microsoft.Compute",
+        "type": "CustomScriptExtension",
+        "typeHandlerVersion": "1.10",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "commandToExecute": "powershell -Command \"netsh advfirewall firewall add rule name=ICMP protocol=icmpv4 dir=in action=allow\""
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines', 'vm-azure')]"
+      ]
+    }
+  ],
+  "outputs": {
+    "onPremVmPublicIp": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', 'pip-vm-onprem'), '2023-09-01').ipAddress]"
+    },
+    "onPremVmPrivateIp": {
+      "type": "string",
+      "value": "192.168.1.4"
+    },
+    "azureVmPublicIp": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', 'pip-vm-azure'), '2023-09-01').ipAddress]"
+    },
+    "azureVmPrivateIp": {
+      "type": "string",
+      "value": "10.0.1.4"
+    },
+    "onPremVpnGwPublicIp": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', 'pip-vpngw-onprem'), '2023-09-01').ipAddress]"
+    },
+    "azureVpnGwPublicIp": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', 'pip-vpngw-azure'), '2023-09-01').ipAddress]"
+    },
+    "onPremBgpAsn": {
+      "type": "int",
+      "value": 65001
+    },
+    "azureBgpAsn": {
+      "type": "int",
+      "value": 65002
+    }
+  }
+}
